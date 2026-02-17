@@ -86,18 +86,23 @@ class CRISPDataset(Dataset):
         }
     
     def _load_image(self, path):
-        """Load image with proper handling of different formats"""
+        """Load image in LINEAR RGB [0,1] - CRITICAL for ISP"""
         if path.lower().endswith(('.tif', '.tiff')):
             # Handle TIFF files (potentially 16-bit)
             img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
             if img.dtype == np.uint16:
-                img = (img / 65535.0 * 255).astype(np.uint8)
+                img = img / 65535.0  # Normalize to [0,1]
             elif img.dtype == np.float32:
-                img = (np.clip(img, 0, 1) * 255).astype(np.uint8)
+                img = np.clip(img, 0, 1)
+            else:
+                img = img / 255.0
             
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # Convert to PIL but keep float range
+            img = (img * 255).astype(np.uint8)
             img = Image.fromarray(img)
         else:
+            # PNG/JPG - already in sRGB, just normalize
             img = Image.open(path).convert('RGB')
         
         return img

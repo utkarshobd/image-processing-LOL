@@ -28,11 +28,8 @@ class CRISPTrainer:
             use_lq_encoder=config.use_lq_encoder
         ).to(self.device)
         
-        # Loss function
-        self.criterion = CRISPLoss(
-            mse_weight=config.mse_weight,
-            style_reg_weight=config.style_reg_weight
-        )
+        # Loss function - PAPER EXACT: MSE ONLY
+        self.criterion = CRISPLoss()
         
         # Optimizer
         self.optimizer = optim.Adam(
@@ -41,10 +38,10 @@ class CRISPTrainer:
             weight_decay=config.weight_decay
         )
         
-        # Learning rate scheduler
-        self.scheduler = optim.lr_scheduler.StepLR(
+        # Learning rate scheduler - PAPER EXACT: halve every 25%
+        self.scheduler = optim.lr_scheduler.MultiStepLR(
             self.optimizer,
-            step_size=config.lr_step_size,
+            milestones=config.lr_milestones,
             gamma=config.lr_gamma
         )
         

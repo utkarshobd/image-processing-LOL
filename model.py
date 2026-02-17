@@ -135,42 +135,31 @@ class CRISP(nn.Module):
 
 class CRISPLoss(nn.Module):
     """
-    Loss function for CRISP training
+    Loss function for CRISP training - PAPER EXACT: MSE ONLY
     """
     
-    def __init__(self, mse_weight=1.0, style_reg_weight=0.01):
+    def __init__(self):
         super(CRISPLoss, self).__init__()
         
-        self.mse_weight = mse_weight
-        self.style_reg_weight = style_reg_weight
-        
-    def forward(self, output, target, style_vec):
+    def forward(self, output, target, style_vec=None):
         """
-        Compute CRISP loss
+        Compute CRISP loss - PAPER EXACT: MSE ONLY
         
         Args:
             output: Enhanced image [B,3,H,W]
             target: Target HQ image [B,3,H,W]
-            style_vec: Style vector [B,style_dim]
+            style_vec: Unused (kept for compatibility)
             
         Returns:
-            loss: Total loss
-            loss_dict: Dictionary of individual losses
+            loss: MSE loss
+            loss_dict: Dictionary with loss
         """
-        # Main reconstruction loss
+        # PAPER SPECIFICATION: ONLY MSE LOSS
         mse_loss = F.mse_loss(output, target)
         
-        # Style regularization (encourage diversity)
-        style_reg = torch.mean(torch.norm(style_vec, dim=1))
-        
-        # Total loss
-        total_loss = (self.mse_weight * mse_loss + 
-                     self.style_reg_weight * style_reg)
-        
         loss_dict = {
-            'total': total_loss,
-            'mse': mse_loss,
-            'style_reg': style_reg
+            'total': mse_loss,
+            'mse': mse_loss
         }
         
-        return total_loss, loss_dict
+        return mse_loss, loss_dict

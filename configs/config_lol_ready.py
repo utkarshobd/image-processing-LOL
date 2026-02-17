@@ -2,7 +2,7 @@
 import os
 
 # Model parameters
-style_dim = 3
+style_dim = 16  # Increased to match paper
 use_lq_encoder = False
 
 # LOL Dataset paths (corrected)
@@ -14,7 +14,7 @@ hq_val_dir = 'datasets/LOL_eval15/high'
 
 # Training parameters
 num_epochs = 300
-batch_size = 4
+batch_size = 8  # Increased from 4
 learning_rate = 1e-4
 weight_decay = 1e-5
 
@@ -24,7 +24,8 @@ lr_gamma = 0.5
 
 # Loss weights
 mse_weight = 1.0
-style_reg_weight = 0.005
+perceptual_weight = 0.1  # Added perceptual loss
+style_reg_weight = 0.01
 
 # Data loading
 crop_size = 256
